@@ -1,41 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Topotrainer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
-  <div id="topbar">
-    <h1>Topotrainer</h1>
-    <button id="menuToggle">☰</button>
-  </div>
+  <div id="app">
 
-  <!-- Mobile dropdown menu -->
-  <div id="mobileMenu">
-    <h3>Load Files</h3>
+    <!-- Top bar -->
+    <header id="topbar">
+      <div class="topbar-left">
+        <h1>Topotrainer</h1>
+      </div>
+      <div class="topbar-right">
+        <label>
+          Basemap:
+          <select id="basemapSelect"></select>
+        </label>
+        <button id="menuToggle">☰</button>
+      </div>
+    </header>
 
-    <label class="fileLabel">
-      Upload Quiz Questions
-      <input type="file" id="quizInput" accept=".txt">
-    </label>
-
-    <label class="fileLabel">
-      Upload GeoJSON
-      <input type="file" id="geojsonInput" accept=".geojson,.json">
-    </label>
-
-    <h3>Layers</h3>
-    <div id="layerList"></div>
-  </div>
-
-  <!-- Quiz card -->
-  <div id="quizCard">
-    <div id="modeTitle">Quiz</div>
-    <div id="modeInstruction">Click the correct location on the map.</div>
-    <div id="taskText"></div>
-
-    <div id="progressContainer">
-      <div id="progressBar"></div>
+    <!-- Mobile dropdown menu -->
+    <div id="mobileMenu">
+      <label class="fileLabel">
+        Upload quiz questions
+        <input type="file" id="quizInputMobile" accept=".txt">
+      </label>
+      <label class="fileLabel">
+        Upload GeoJSON
+        <input type="file" id="geojsonInputMobile" accept=".geojson,.json">
+      </label>
+      <div id="layerListMobile"></div>
     </div>
 
-    <div id="feedback"></div>
-    <div id="score"></div>
-  </div>
+    <!-- Quiz card: sits here on mobile, moved into sidebar on desktop by JS -->
+    <div id="quizCard">
+      <div id="taskText">Upload quiz questions and GeoJSON to get started.</div>
+      <div id="progressContainer">
+        <div id="progressBar"></div>
+      </div>
+      <div id="feedback"></div>
+      <div id="score"></div>
+      <button id="nextTaskBtn" style="display:none;">Next</button>
+    </div>
 
-  <!-- Map -->
-  <div id="map"></div>
+    <!-- Main content -->
+    <div id="content">
+
+      <!-- Sidebar (desktop only) -->
+      <aside id="sidebar">
+        <h2>Quiz</h2>
+        <section>
+          <h3>Upload questions</h3>
+          <input type="file" id="quizInput" accept=".txt">
+          <h3>Upload map data</h3>
+          <input type="file" id="geojsonInput" accept=".geojson,.json">
+          <div id="layerList"></div>
+        </section>
+      </aside>
+
+      <!-- Map -->
+      <main id="mapContainer">
+        <div id="map"></div>
+      </main>
+
+    </div><!-- /#content -->
+
+  </div><!-- /#app -->
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="main.js"></script>
 </body>
+</html>

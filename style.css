@@ -8,7 +8,20 @@ body {
   background: #f5f5f5;
 }
 
-/* Topbar */
+/* ======================================================
+   APP SHELL
+====================================================== */
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ======================================================
+   TOPBAR
+====================================================== */
+
 #topbar {
   display: flex;
   justify-content: space-between;
@@ -16,6 +29,7 @@ body {
   background: #1f2937;
   color: white;
   padding: 0.6rem 1rem;
+  flex-shrink: 0;
 }
 
 #topbar h1 {
@@ -23,19 +37,41 @@ body {
   margin: 0;
 }
 
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.topbar-right label {
+  color: white;
+  font-size: 0.9rem;
+}
+
+.topbar-right select {
+  margin-left: 0.3rem;
+}
+
 #menuToggle {
   background: none;
   border: none;
   color: white;
   font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
 }
 
-/* Mobile menu */
+/* ======================================================
+   MOBILE DROPDOWN MENU
+====================================================== */
+
 #mobileMenu {
   display: none;
   background: white;
   padding: 1rem;
   border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
 }
 
 #mobileMenu.open {
@@ -53,22 +89,21 @@ body {
   margin-top: 0.3rem;
 }
 
-/* Quiz card */
+/* ======================================================
+   QUIZ CARD (mobile: strip below topbar; desktop: in sidebar)
+====================================================== */
+
 #quizCard {
   background: white;
-  padding: 1rem;
+  padding: 0.8rem 1rem;
   border-bottom: 1px solid #ddd;
-}
-
-#modeTitle {
-  font-size: 1.2rem;
-  font-weight: bold;
+  flex-shrink: 0;
 }
 
 #taskText {
-  margin-top: 0.5rem;
   font-size: 1rem;
   font-weight: 500;
+  color: #111827;
 }
 
 #feedback {
@@ -76,13 +111,8 @@ body {
   font-weight: bold;
 }
 
-#feedback.ok {
-  color: #16a34a;
-}
-
-#feedback.error {
-  color: #dc2626;
-}
+#feedback.ok    { color: #16a34a; }
+#feedback.error { color: #dc2626; }
 
 #score {
   margin-top: 0.3rem;
@@ -90,13 +120,13 @@ body {
   color: #374151;
 }
 
-/* Progress bar */
 #progressContainer {
   width: 100%;
   height: 8px;
   background: #e5e7eb;
   border-radius: 4px;
   margin-top: 0.8rem;
+  overflow: hidden;
 }
 
 #progressBar {
@@ -107,43 +137,108 @@ body {
   transition: width 0.3s ease;
 }
 
-/* Map */
-#map {
-  width: 100%;
-  height: calc(100vh - 260px);
+#nextTaskBtn {
+  margin-top: 0.8rem;
+  padding: 0.4rem 0.8rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
-/* Tablet/laptop layout */
+#nextTaskBtn:hover {
+  background: #1d4ed8;
+}
+
+/* ======================================================
+   CONTENT (sidebar + map)
+====================================================== */
+
+#content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ======================================================
+   SIDEBAR (desktop only)
+====================================================== */
+
+#sidebar {
+  display: none;
+  width: 280px;
+  flex-shrink: 0;
+  background: white;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+#sidebar h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.8rem;
+}
+
+#sidebar h3 {
+  font-size: 0.9rem;
+  margin: 1rem 0 0.3rem;
+  color: #374151;
+}
+
+#sidebar section {
+  border-top: 1px solid #eee;
+  padding-top: 0.8rem;
+}
+
+#sidebar input[type="file"] {
+  display: block;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+#layerList, #layerListMobile {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+#layerList label, #layerListMobile label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+/* ======================================================
+   MAP
+====================================================== */
+
+#mapContainer {
+  position: relative;
+  flex: 1;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/* ======================================================
+   DESKTOP (800px+)
+====================================================== */
+
 @media (min-width: 800px) {
-  body {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    grid-template-rows: auto 1fr;
-  }
+  /* Hide mobile-only elements */
+  #menuToggle  { display: none; }
+  #mobileMenu  { display: none !important; }
+  #quizCard    { display: none; }
 
-  #topbar {
-    grid-column: 1 / 3;
-  }
+  /* Show sidebar */
+  #sidebar { display: flex; flex-direction: column; }
 
-  #mobileMenu {
-    display: block !important;
-    border-right: 1px solid #ddd;
-    border-bottom: none;
-    height: calc(100vh - 60px);
-    overflow-y: auto;
-  }
-
-  #quizCard {
-    border-bottom: none;
-    border-right: 1px solid #ddd;
-    height: auto;
-  }
-
-  #map {
-    height: calc(100vh - 60px);
-  }
-
-  #menuToggle {
-    display: none;
+  /* Quiz card content moves into sidebar on desktop */
+  #sidebar::before {
+    content: '';
   }
 }

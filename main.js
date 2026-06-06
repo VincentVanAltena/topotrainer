@@ -1,5 +1,5 @@
 // ======================================================
-//  KAART INITIALISEREN
+//  MAP
 // ======================================================
 
 const map = L.map('map', {
@@ -7,132 +7,100 @@ const map = L.map('map', {
   zoom: 5
 });
 
-// Basemaps
 const basemaps = {
-  "AWMC Imperium": L.tileLayer('https://tiles.awmc.unc.edu/imperium/{z}/{x}/{y}.png', {
+  "AWMC Antiquity": L.tileLayer('https://cawm.lib.uiowa.edu/tiles/{z}/{x}/{y}.png',{
     attribution: '&copy; AWMC'
   }),
-  "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+  "DARE": L.tileLayer('https://dh.gu.se/tiles/imperium/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://dh.gu.se/dare/">Digital Atlas of the Roman Empire</a>, University of Gothenburg'
+  }),
+  "Esri World Imagery": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri'
+  }),
+  "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  })
 };
 
-// Standaard basemap
-basemaps["AWMC Imperium"].addTo(map);
+basemaps["AWMC Antiquity"].addTo(map);
+
+const basemapSelect = document.getElementById("basemapSelect");
+for (const name of Object.keys(basemaps)) {
+  const opt = document.createElement("option");
+  opt.value = name;
+  opt.textContent = name;
+  basemapSelect.appendChild(opt);
+}
+basemapSelect.addEventListener("change", e => {
+  for (const layer of Object.values(basemaps)) map.removeLayer(layer);
+  basemaps[e.target.value].addTo(map);
+});
 
 
 // ======================================================
-//  UI MANAGER
+//  UI
 // ======================================================
 
-const UIManager = {
-  titleEl: document.getElementById("modeTitle"),
-  instrEl: document.getElementById("modeInstruction"),
-  taskEl: document.getElementById("taskText"),
-  feedbackEl: document.getElementById("feedback"),
-  scoreEl: document.getElementById("score"),
+const taskEl     = document.getElementById("taskText");
+const feedbackEl = document.getElementById("feedback");
+const scoreEl    = document.getElementById("score");
+const nextBtn    = document.getElementById("nextTaskBtn");
 
-  setTitle(t) { this.titleEl.textContent = t; },
-  setInstruction(t) { this.instrEl.textContent = t; },
-  setTask(t) { this.taskEl.textContent = t; },
-  setFeedback(t, type = "") {
-    this.feedbackEl.textContent = t;
-    this.feedbackEl.className = type;
-  },
-  setScore(t) { this.scoreEl.textContent = t; }
-};
-
-
-// ======================================================
-//  PROGRESS BAR
-// ======================================================
+function setTask(t)               { taskEl.textContent = t; }
+function setFeedback(t, cls = "") { feedbackEl.textContent = t; feedbackEl.className = cls; }
+function setScore(t)              { scoreEl.textContent = t; }
 
 function updateProgress(current, total) {
-  const pct = Math.round((current / total) * 100);
+  const pct = total ? Math.round((current / total) * 100) : 0;
   document.getElementById("progressBar").style.width = pct + "%";
 }
 
 
 // ======================================================
-//  QUIZ VRAGEN (worden overschreven bij upload)
+//  QUIZ PARSER
 // ======================================================
 
 let QUIZ_QUESTIONS = [];
 
-
-// ======================================================
-//  QUIZ PARSER (TXT → vragen)
-// ======================================================
-
 function parseQuizFile(text) {
-  const lines = text.split("\n");
-  const questions = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-
-    const parts = trimmed.split("|");
-    if (parts.length !== 2) continue;
-
-    questions.push({
-      id: "q-" + Math.random().toString(36).slice(2),
-      text: parts[0].trim(),
-      targetName: parts[1].trim()
-    });
-  }
-  return questions;
+  return text.split("\n")
+    .map(l => l.trim())
+    .filter(l => l && !l.startsWith("#"))
+    .map(l => {
+      const parts = l.split("|");
+      if (parts.length !== 2) return null;
+      return { text: parts[0].trim(), targetName: parts[1].trim() };
+    })
+    .filter(Boolean);
 }
 
 
 // ======================================================
-//  FOUTSTATISTIEKEN OPSLAAN
+//  STATS & STORAGE
 // ======================================================
 
-function registerWrongAnswer(name) {
-  const stats = JSON.parse(localStorage.getItem("featureStats") || "{}");
+function getStats() {
+  return JSON.parse(localStorage.getItem("featureStats") || "{}");
+}
+
+function recordAnswer(name, correct) {
+  const stats = getStats();
   if (!stats[name]) stats[name] = { wrong: 0, correct: 0 };
-  stats[name].wrong++;
+  if (correct) stats[name].correct++;
+  else stats[name].wrong++;
   localStorage.setItem("featureStats", JSON.stringify(stats));
 }
-
-function registerCorrectAnswer(name) {
-  const stats = JSON.parse(localStorage.getItem("featureStats") || "{}");
-  if (!stats[name]) stats[name] = { wrong: 0, correct: 0 };
-  stats[name].correct++;
-  localStorage.setItem("featureStats", JSON.stringify(stats));
-}
-
-
-// ======================================================
-//  QUIZ RESULTATEN OPSLAAN
-// ======================================================
 
 function saveQuizResult(correct, total) {
   const results = JSON.parse(localStorage.getItem("quizResults") || "[]");
-  results.push({
-    date: new Date().toISOString(),
-    correct,
-    total
-  });
+  results.push({ date: new Date().toISOString(), correct, total });
   localStorage.setItem("quizResults", JSON.stringify(results));
 }
 
 
 // ======================================================
-//  ADAPTIEVE QUIZ (moeilijke vragen vaker)
+//  ADAPTIVE ORDERING
 // ======================================================
-
-function weightedQuestions(questions) {
-  const stats = JSON.parse(localStorage.getItem("featureStats") || "{}");
-  const weighted = [];
-
-  for (const q of questions) {
-    const s = stats[q.targetName] || { wrong: 0 };
-    const weight = 1 + s.wrong;
-    for (let i = 0; i < weight; i++) weighted.push(q);
-  }
-
-  return shuffle(weighted);
-}
 
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -142,50 +110,60 @@ function shuffle(arr) {
   return arr;
 }
 
+function weightedQuestions(questions) {
+  // Questions answered incorrectly more often appear more frequently
+  const stats = getStats();
+  const weighted = [];
+  for (const q of questions) {
+    const weight = 1 + (stats[q.targetName]?.wrong || 0);
+    for (let i = 0; i < weight; i++) weighted.push(q);
+  }
+  return shuffle(weighted);
+}
+
 
 // ======================================================
-//  QUIZ ENGINE (ENKEL QUIZ, GEEN MODES)
+//  QUIZ ENGINE
 // ======================================================
 
-const QuizMode = {
+const Quiz = {
   index: 0,
   correct: 0,
   total: 0,
-  weightedList: [],
+  list: [],
+  active: false,
 
-  enable() {
+  start() {
+    if (!QUIZ_QUESTIONS.length) return;
     this.index = 0;
     this.correct = 0;
     this.total = 0;
+    this.active = true;
+    this.list = weightedQuestions(QUIZ_QUESTIONS);
 
-    this.weightedList = weightedQuestions(QUIZ_QUESTIONS);
-
-    UIManager.setTitle("Quiz");
-    UIManager.setInstruction("Klik op de juiste locatie.");
-    UIManager.setFeedback("");
-    UIManager.setScore("");
-
-    this._showCurrentQuestion();
-    updateProgress(0, this.weightedList.length);
+    setFeedback("");
+    setScore("");
+    nextBtn.style.display = "none";
+    updateProgress(0, this.list.length);
+    this._show();
   },
 
-  _showCurrentQuestion() {
-    const q = this.weightedList[this.index];
+  _show() {
+    const q = this.list[this.index];
     if (!q) {
-      UIManager.setTask("Quiz voltooid!");
+      setTask("Quiz complete!");
+      setScore(`Final score: ${this.correct} / ${this.total}`);
       saveQuizResult(this.correct, this.total);
-      updateProgress(this.weightedList.length, this.weightedList.length);
+      updateProgress(this.list.length, this.list.length);
+      this.active = false;
       return;
     }
-    UIManager.setTask(q.text);
-  },
-
-  _updateScore() {
-    UIManager.setScore(`Score: ${this.correct} / ${this.total}`);
+    setTask(q.text);
   },
 
   handleClick(feature) {
-    const q = this.weightedList[this.index];
+    if (!this.active) return;
+    const q = this.list[this.index];
     if (!q) return;
 
     const name = feature.properties?.name || feature.properties?.label || "";
@@ -195,60 +173,45 @@ const QuizMode = {
 
     if (normalize(name) === normalize(q.targetName)) {
       this.correct++;
-      registerCorrectAnswer(q.targetName);
-      UIManager.setFeedback("Goed!", "ok");
-      this.nextQuestion();
+      recordAnswer(q.targetName, true);
+      setFeedback("Correct!", "ok");
+      this.index++;
+      updateProgress(this.index, this.list.length);
+      this._show();
     } else {
-      registerWrongAnswer(q.targetName);
-      UIManager.setFeedback(`Fout: ${name}`, "error");
+      recordAnswer(q.targetName, false);
+      setFeedback(`Wrong: ${name}`, "error");
     }
 
-    this._updateScore();
-  },
-
-  nextQuestion() {
-    this.index++;
-    updateProgress(this.index, this.weightedList.length);
-    this._showCurrentQuestion();
+    setScore(`Score: ${this.correct} / ${this.total}`);
   }
 };
 
 
 // ======================================================
-//  GEOJSON LADEN
+//  GEOJSON
 // ======================================================
 
 const layers = {};
 const layerListEl = document.getElementById("layerList");
 
-document.getElementById("geojsonInput").addEventListener("change", async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const data = JSON.parse(await file.text());
-  addGeoJSONLayer(file.name, data);
-});
-
 function addGeoJSONLayer(name, data) {
   const layer = L.geoJSON(data, {
     style: { color: "#2563eb", weight: 2, fillOpacity: 0.2 },
-    onEachFeature: (feature, layer) => {
-      layer.on("click", () => handleFeatureClick(feature));
+    onEachFeature: (feature, lyr) => {
+      lyr.on("click", () => Quiz.handleClick(feature));
     }
   }).addTo(map);
 
   layers[name] = layer;
 
+  // Add a toggle checkbox to the layer list
   const div = document.createElement("div");
   div.innerHTML = `<label><input type="checkbox" checked data-layer="${name}"> ${name}</label>`;
-  const checkbox = div.querySelector("input");
-
-  checkbox.addEventListener("change", e => {
-    const lname = e.target.dataset.layer;
-    if (e.target.checked) map.addLayer(layers[lname]);
-    else map.removeLayer(layers[lname]);
+  div.querySelector("input").addEventListener("change", e => {
+    if (e.target.checked) map.addLayer(layers[name]);
+    else map.removeLayer(layers[name]);
   });
-
   layerListEl.appendChild(div);
 
   try { map.fitBounds(layer.getBounds()); } catch {}
@@ -256,27 +219,44 @@ function addGeoJSONLayer(name, data) {
 
 
 // ======================================================
-//  QUIZ UPLOAD
+//  FILE UPLOADS
 // ======================================================
 
-document.getElementById("quizInput").addEventListener("change", async e => {
+async function handleQuizUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
+  QUIZ_QUESTIONS = parseQuizFile(await file.text());
+  Quiz.start();
+}
 
-  const text = await file.text();
-  const questions = parseQuizFile(text);
+async function handleGeojsonUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const data = JSON.parse(await file.text());
+  addGeoJSONLayer(file.name, data);
+}
 
-  QUIZ_QUESTIONS = questions;
-  QuizMode.enable();
+["quizInput", "quizInputMobile"].forEach(id =>
+  document.getElementById(id).addEventListener("change", handleQuizUpload)
+);
+
+["geojsonInput", "geojsonInputMobile"].forEach(id =>
+  document.getElementById(id).addEventListener("change", handleGeojsonUpload)
+);
+
+
+// ======================================================
+//  MOBILE MENU TOGGLE
+// ======================================================
+
+document.getElementById("menuToggle").addEventListener("click", () => {
+  document.getElementById("mobileMenu").classList.toggle("open");
 });
 
-// ======================================================
-//  KLIKAFHANDELING
-// ======================================================
 
-function handleFeatureClick(feature) {
-  QuizMode.handleClick(feature);
-}
+// ======================================================
+//  HELPERS
+// ======================================================
 
 function normalize(str) {
   return String(str).toLowerCase().trim();
@@ -284,8 +264,29 @@ function normalize(str) {
 
 
 // ======================================================
-//  QUIZ STARTEN BIJ PAGINA-LAAD
+//  QUIZ CARD: move into sidebar on desktop, above map on mobile
 // ======================================================
 
-UIManager.setTitle("Quiz");
-UIManager.setInstruction("Upload quizvragen en GeoJSON om te beginnen.");
+(function placeQuizCard() {
+  const card = document.getElementById("quizCard");
+  const sidebar = document.getElementById("sidebar");
+
+  function reattach() {
+    if (window.innerWidth >= 800) {
+      // Desktop: place quiz card at the top of the sidebar
+      sidebar.prepend(card);
+      card.style.display = "block";
+      card.style.borderBottom = "none";
+      card.style.borderTop = "none";
+    } else {
+      // Mobile: place quiz card directly after the mobile menu
+      const app = document.getElementById("app");
+      const mobileMenu = document.getElementById("mobileMenu");
+      app.insertBefore(card, mobileMenu.nextSibling);
+      card.style.display = "block";
+    }
+  }
+
+  reattach();
+  window.addEventListener("resize", reattach);
+})();
