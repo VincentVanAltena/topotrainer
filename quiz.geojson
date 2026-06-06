@@ -1,0 +1,141 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              35.63164062500002,
+              32.781640625
+            ],
+            [
+              35.61591796875001,
+              32.749169921874994
+            ],
+            [
+              35.57685546875001,
+              32.7203125
+            ],
+            [
+              35.55126953125,
+              32.749609375
+            ],
+            [
+              35.53388671875001,
+              32.80341796875
+            ],
+            [
+              35.539160156250006,
+              32.855615234374994
+            ],
+            [
+              35.565039062500006,
+              32.8916015625
+            ],
+            [
+              35.59892578125002,
+              32.899707031249996
+            ],
+            [
+              35.62285156250002,
+              32.878369140625
+            ],
+            [
+              35.635839843750006,
+              32.833837890625
+            ],
+            [
+              35.63164062500002,
+              32.781640625
+            ]
+          ]
+        ]
+      },
+      "properties": { "name": "Sea of Galilee" }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Ephesus" },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [27.341, 37.949]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": { "name": "Corinth" },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [22.93, 37.94]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": { "name": "Antioch" },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36.20, 36.20]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": { "name": "Jerusalem" },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [35.22, 31.78]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": { "name": "Alexandria" },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [29.91, 31.20]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": { "name": "Nicaea" },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [29.72, 40.43]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": { "name": "Chalcedon" },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [29.03, 40.98]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": { "name": "Hippo Regius" },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.77, 36.90]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": { "name": "Carthage" },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [10.33, 36.85]
+      }
+    }
+
+  ]
+}
