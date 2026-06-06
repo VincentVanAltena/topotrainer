@@ -19,7 +19,7 @@ const basemaps = {
   }),
   "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
-  })
+  }),
 };
 
 basemaps["AWMC Antiquity"].addTo(map);
@@ -290,3 +290,12 @@ function normalize(str) {
   reattach();
   window.addEventListener("resize", reattach);
 })();
+
+
+// ======================================================
+//  SPLASH SCREEN
+// ======================================================
+
+document.getElementById("splashClose").addEventListener("click", () => {
+  document.getElementById("splash").classList.add("hidden");
+});

@@ -13,6 +13,22 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Splash screen -->
+  <div id="splash">
+    <div id="splashBox">
+      <h1>Welcome to Topotrainer</h1>
+      <p>Test your knowledge of historical geography by clicking locations on the map.</p>
+      <ol>
+        <li>Upload a <strong>.txt</strong> quiz file — one question per line in the format:<br>
+          <code>Where is Rome? | Rome</code></li>
+        <li>Upload a <strong>.geojson</strong> file with the map features to click on.</li>
+        <li>A question appears — click the correct location on the map.</li>
+        <li>Harder questions are repeated more often based on your history.</li>
+      </ol>
+      <button id="splashClose">Get started</button>
+    </div>
+  </div>
+
   <div id="app">
 
     <!-- Top bar -->

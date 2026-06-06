@@ -242,3 +242,77 @@ body {
     content: '';
   }
 }
+
+
+/* ======================================================
+   SPLASH SCREEN
+====================================================== */
+
+#splash {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#splash.hidden {
+  display: none;
+}
+
+#splashBox {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+
+#splashBox h1 {
+  font-size: 1.4rem;
+  margin: 0 0 0.6rem;
+  color: #1f2937;
+}
+
+#splashBox p {
+  margin: 0 0 1rem;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+#splashBox ol {
+  padding-left: 1.2rem;
+  margin: 0 0 1.5rem;
+  color: #374151;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+#splashBox code {
+  display: inline-block;
+  background: #f3f4f6;
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.85rem;
+  color: #1d4ed8;
+  margin-top: 0.2rem;
+}
+
+#splashClose {
+  display: block;
+  width: 100%;
+  padding: 0.6rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#splashClose:hover {
+  background: #1d4ed8;
+}
