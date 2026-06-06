@@ -1,86 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Topotrainer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Leaflet CSS (CDN) -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
-
-  <link rel="stylesheet" href="style.css">
-</head>
 <body>
-  <div id="app">
-    <header id="topbar">
-      <div class="topbar-left">
-        <h1>Topotrainer</h1>
-      </div>
-      <div class="topbar-right">
-        <label>
-          Basemap:
-          <select id="basemapSelect"></select>
-        </label>
-
-        <label>
-          Modus:
-          <select id="modeSelect">
-            <option value="explore">Explore</option>
-            <option value="task">Task</option>
-            <option value="quiz">Quiz</option>
-          </select>
-        </label>
-      </div>
-    </header>
-
-    <div id="content">
-      <aside id="sidebar">
-        <section>
-          <h2 id="modeTitle">Explore Mode</h2>
-          <p id="modeInstruction">
-            Explore the map and click on features to see information.
-          </p>
-        </section>
-
-        <section>
-          <h3>Upload questions</h3>
-          <input type="file" id="quizInput" accept=".txt">
-
-          <h3>Load Map data (geojson)</h3>
-          <input type="file" id="geojsonInput" accept=".geojson,.json">
-          <div id="layerList"></div>
-        </section>
-
-        <section>
-          <h3>Task / Quiz</h3>
-          <div id="taskText"></div>
-          <div id="feedback"></div>
-          <div id="score"></div>
-          <div id="progressContainer">
-          <div id="progressBar"></div>
-          </div>
-          <button id="nextTaskBtn" style="display:none;">Next</button>
-        </section>
-      </aside>
-
-      <main id="mapContainer">
-        <div id="map"></div>
-      </main>
-    </div>
+  <div id="topbar">
+    <h1>Topotrainer</h1>
+    <button id="menuToggle">☰</button>
   </div>
 
-  <!-- Leaflet JS (CDN) -->
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
+  <!-- Mobile dropdown menu -->
+  <div id="mobileMenu">
+    <h3>Load Files</h3>
 
-  <script src="main.js"></script>
+    <label class="fileLabel">
+      Upload Quiz Questions
+      <input type="file" id="quizInput" accept=".txt">
+    </label>
+
+    <label class="fileLabel">
+      Upload GeoJSON
+      <input type="file" id="geojsonInput" accept=".geojson,.json">
+    </label>
+
+    <h3>Layers</h3>
+    <div id="layerList"></div>
+  </div>
+
+  <!-- Quiz card -->
+  <div id="quizCard">
+    <div id="modeTitle">Quiz</div>
+    <div id="modeInstruction">Click the correct location on the map.</div>
+    <div id="taskText"></div>
+
+    <div id="progressContainer">
+      <div id="progressBar"></div>
+    </div>
+
+    <div id="feedback"></div>
+    <div id="score"></div>
+  </div>
+
+  <!-- Map -->
+  <div id="map"></div>
 </body>
-</html>
